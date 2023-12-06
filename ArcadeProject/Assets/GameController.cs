@@ -13,6 +13,7 @@ public class GameController : MonoBehaviour
     [SerializeField] private UI uiController;
 
     [SerializeField] private GameSettings gameSettings;
+    [SerializeField] private Ball ball;
 
     private int activeTileCount;
 
@@ -20,16 +21,48 @@ public class GameController : MonoBehaviour
 
     private float roundTimer;
 
+    private bool hasRoundEnded;
+
+    private delegate void OnResetGame();
+    private event OnResetGame onResetGame;
+
     private void Start()
+    {
+        onResetGame += ResetGame;
+        onResetGame += ball.ResetGame;
+        onResetGame?.Invoke();
+    }
+
+    private void ResetGame()
     {
         roundTimer = gameSettings != null ? gameSettings.maxRoundTimer : 60;
         uiController.Init(roundTimer);
+        hasRoundEnded = false;
     }
 
     private void Update()
     {
-        roundTimer -= Time.deltaTime;
-        uiController.UpdateTimer(roundTimer);
+        if (hasRoundEnded) return;
+
+        if (roundTimer > 0)
+        {
+            roundTimer -= Time.deltaTime;
+            uiController.UpdateTimer(roundTimer);
+        }
+
+        else
+        {
+            hasRoundEnded = true;
+
+            StartCoroutine(OnRoundEnd());
+        }
+    }
+
+    private IEnumerator OnRoundEnd(float _delay = 5)
+    {
+        yield return new WaitForSecondsRealtime(_delay);
+
+
     }
 
     public Transform[,] CreateGrid()

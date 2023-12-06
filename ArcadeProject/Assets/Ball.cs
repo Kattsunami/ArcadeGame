@@ -11,6 +11,8 @@ public class Ball : MonoBehaviour
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private SpriteRenderer sprite;
     [SerializeField] private TrailRenderer trail;
+    [SerializeField] private ParticleSystem particleRebound;
+    private ParticleSystem.MainModule particleMain;
 
     [Space(15)]
     [SerializeField] private Color blueColour;
@@ -25,6 +27,8 @@ public class Ball : MonoBehaviour
     {
         RandomizeVelocity();
         UpdateBall(0);
+
+        particleMain = particleRebound.main;
     }
 
     public void RandomizeVelocity()
@@ -33,18 +37,18 @@ public class Ball : MonoBehaviour
         rb.velocity = _randDirection * Random.Range(minRandomVelocity, maxRandomVelocity);
     }
 
-    public void OnGUI()
+    public void ResetGame()
     {
-        
+
     }
 
     private void OnCollisionEnter2D(Collision2D _collision)
     {
-        Vector2 _velocity = rb.velocity;
-
         if (_collision.transform.tag == "Player1") UpdateBall(1);
         if (_collision.transform.tag == "Player2") UpdateBall(2);
         if (_collision.transform.tag == "Nullifier") UpdateBall(0);
+
+        Instantiate(particleRebound, transform.position, Quaternion.identity);
     }
 
     private void OnTriggerEnter2D(Collider2D _collision)
@@ -69,14 +73,13 @@ public class Ball : MonoBehaviour
             case 1:
                 sprite.color = blueColour;
                 trail.colorGradient = blueGradient;
+                particleMain.startColor = blueGradient;
                 break;
 
             case 2:
                 sprite.color = redColour;
                 trail.colorGradient = redGradient;
-                break;
-            default:
-
+                particleMain.startColor = redGradient;
                 break;
         }
     }

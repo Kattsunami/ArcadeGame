@@ -7,6 +7,7 @@ public class GameSettings : ScriptableObject
     [Range(3, 99)] public int maxRounds;
     [Tooltip("Quantity of the map required for a default victory in Domination")] [Range(0f, 1f)] public float dominationQuota = 1f;
 
+    public WinCondition winCondition;
 }
 
 public enum WinCondition
