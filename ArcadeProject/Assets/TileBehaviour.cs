@@ -22,6 +22,8 @@ public class TileBehaviour : MonoBehaviour
         neutralTileCount = _totalTiles;
         blueTileCount = 0; 
         redTileCount = 0;
+
+        onTileTakeOver?.Invoke(0, 0);
     }
 
     public void UpdateTile(int _newValue)

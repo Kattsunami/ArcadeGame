@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9de3bd8893820344897270a044f6d0a7, type: 3}
   m_Name: GameSettings Main
   m_EditorClassIdentifier: 
-  maxRoundTimer: 32
+  maxRoundTimer: 15
   maxRounds: 5
   dominationQuota: 1
+  winCondition: 0

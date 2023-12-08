@@ -23,11 +23,18 @@ public class GameController : MonoBehaviour
 
     private bool hasRoundEnded;
 
+    private int roundCount = 1;
+    private int redRounds = 0;
+    private int blueRounds = 0;
+
     private delegate void OnResetGame();
     private event OnResetGame onResetGame;
 
     private void Start()
     {
+        roundCount = 1;
+        uiController.Init(roundTimer);
+
         onResetGame += ResetGame;
         onResetGame += ball.ResetGame;
         onResetGame?.Invoke();
@@ -36,7 +43,9 @@ public class GameController : MonoBehaviour
     private void ResetGame()
     {
         roundTimer = gameSettings != null ? gameSettings.maxRoundTimer : 60;
-        uiController.Init(roundTimer);
+
+        SetGrid(CreateGrid());
+        uiController.SetUI(roundCount, gameSettings ? gameSettings.maxRounds : 5);
         hasRoundEnded = false;
     }
 
@@ -53,16 +62,26 @@ public class GameController : MonoBehaviour
         else
         {
             hasRoundEnded = true;
-
             StartCoroutine(OnRoundEnd());
         }
     }
 
     private IEnumerator OnRoundEnd(float _delay = 5)
-    {
+    {        
+        int _winner = TileBehaviour.blueTileCount > TileBehaviour.redTileCount ? 1 : TileBehaviour.blueTileCount < TileBehaviour.redTileCount ? 2 : 0;
+        if (_winner == 1) blueRounds++;
+        if (_winner == 2) redRounds++;
+        if (_winner != 0) roundCount++;
+
+        int _maxRounds = gameSettings ? gameSettings.maxRounds : 5;
+
+        uiController.OnUpdateRound(roundCount, _maxRounds, redRounds, blueRounds);
+
+        if (blueRounds == (_maxRounds / 2) + 1 || blueRounds == (_maxRounds / 2) + 1) yield return null;
+
         yield return new WaitForSecondsRealtime(_delay);
 
-
+        onResetGame?.Invoke();
     }
 
     public Transform[,] CreateGrid()
@@ -71,7 +90,9 @@ public class GameController : MonoBehaviour
 
         Transform[,] _newGrid = new Transform[maxWidth, maxHeight];
         activeTileCount = maxWidth * maxHeight;
-        
+
+        TileBehaviour.ResetTiles(activeTileCount);
+
         for (int _x = 0; _x < maxWidth; _x++)
         {
             for (int _y = 0; _y < maxHeight; _y++)

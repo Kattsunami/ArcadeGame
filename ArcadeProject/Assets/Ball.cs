@@ -25,7 +25,7 @@ public class Ball : MonoBehaviour
 
     private void Start()
     {
-        RandomizeVelocity();
+        StartCoroutine(VelocityDelay());
         UpdateBall(0);
 
         particleMain = particleRebound.main;
@@ -39,7 +39,17 @@ public class Ball : MonoBehaviour
 
     public void ResetGame()
     {
+        UpdateBall(0);
+        rb.velocity = new Vector2(0, 0);
+        transform.position = Vector2.zero;
 
+        StartCoroutine(VelocityDelay());
+    }
+
+    private IEnumerator VelocityDelay(float _timer = 3)
+    {
+        yield return new WaitForSeconds(_timer);
+        RandomizeVelocity();
     }
 
     private void OnCollisionEnter2D(Collision2D _collision)
